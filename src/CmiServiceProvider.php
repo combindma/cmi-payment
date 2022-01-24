@@ -14,4 +14,11 @@ class CmiServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews();
     }
+
+    public function packageRegistered()
+    {
+        $this->app->bind('cmi', function ($app) {
+            return new Cmi();
+        });
+    }
 }
