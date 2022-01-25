@@ -11,8 +11,8 @@ class CmiServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('cmi-payment')
-            ->hasConfigFile()
-            ->hasViews();
+            ->hasConfigFile('cmi-payment')
+            ->hasViews('cmi');
     }
 
     public function packageRegistered()
