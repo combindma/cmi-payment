@@ -53,37 +53,46 @@ class Cmi
         $this->encoding = config('cmi-payment.encoding');
         $this->autoRedirect = (bool)config('cmi-payment.autoRedirect');
         $this->sessionTimeout = config('cmi-payment.sessionTimeout');
-        $this->rnd = (string)microtime();
-
+        $this->rnd = microtime();
         $this->guardAgainstInvalidConfiguration();
     }
 
-    public function getBaseUri()
+    public function getBaseUri(): null|string
     {
         return $this->baseUri;
     }
 
-    public function enableAutoRedirect()
+    public function getFailUrl(): null | string
+    {
+        return $this->failUrl;
+    }
+
+    public function getShopUrl(): null | string
+    {
+        return $this->shopUrl;
+    }
+
+    public function enableAutoRedirect(): void
     {
         $this->autoRedirect = true;
     }
 
-    public function disableAutoRedirect()
+    public function disableAutoRedirect(): void
     {
         $this->autoRedirect = false;
     }
 
-    public function enableCallbackRespense()
+    public function enableCallbackRespense(): void
     {
         $this->callbackResponse = true;
     }
 
-    public function disableCallbackRespense()
+    public function disableCallbackRespense(): void
     {
         $this->callbackResponse = false;
     }
 
-    public function setSessionTimeout($seconds)
+    public function setSessionTimeout($seconds): void
     {
         $this->sessionTimeout = (string)$seconds;
     }
@@ -108,9 +117,9 @@ class Cmi
         $this->billToName = $billToName;
     }
 
-    public function setTel($tel): void
+    public function setTel(string $tel): void
     {
-        $this->tel = (string)$tel;
+        $this->tel = $tel;
     }
 
     public function setLang(string $lang): void
@@ -148,7 +157,7 @@ class Cmi
         $this->okUrl = $okUrl;
     }
 
-    public function getHash(array $params = [])
+    public function getHash(array $params = []): string
     {
         $cmiData = $this->getCmiData($params);
         $plainText = $this->getPlainText($cmiData);
@@ -158,7 +167,7 @@ class Cmi
         return $hash;
     }
 
-    public function getCmiData(array $params = [])
+    public function getCmiData(array $params = []): array
     {
         $cmiParams = array_merge(get_object_vars($this), $params);
         $this->unsetData($cmiParams);
@@ -166,29 +175,34 @@ class Cmi
         return $cmiParams;
     }
 
-    private function getPlainText(&$data)
+    private function getPlainText(&$data): string
     {
         $this->formatData($data);
-        $data = array_merge($data, [
-            'storekey' => $this->storeKey,
-        ]);
+        $plainText = '';
+        foreach ($data as $value) {
+            $lowerParam = strtolower($value);
+            if ($lowerParam != 'hash' && $lowerParam != 'encoding') {
+                $plainText = $plainText . $value . "|";
+            }
+        }
+        $escapedStoreKey = str_replace("|", "\\|", str_replace("\\", "\\\\", $this->storeKey));
 
-        return implode('|', $data);
+        return $plainText . $escapedStoreKey;
     }
 
-    private function unsetData(&$data)
+    private function formatData(&$data): void
+    {
+        natcasesort($data);
+        foreach ($data as $key => $value) {
+            $formattedValue = trim($value);
+            $formattedValue = str_replace("|", "\\|", str_replace("\\", "\\\\", $formattedValue));
+            $data[$key] = $formattedValue;
+        }
+    }
+
+    private function unsetData(&$data): void
     {
         unset($data['storeKey'], $data['baseUri']);
-
-        return $data;
-    }
-
-    private function formatData(&$data)
-    {
-        ksort($data);
-        foreach ($data as $key => $value) {
-            $data[$key] = trim(strtolower($value));
-        }
     }
 
     /**

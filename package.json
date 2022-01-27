@@ -1,0 +1,17 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "npm run development",
+        "development": "mix --mix-config=webpack.mix.js",
+        "watch": "mix watch --mix-config=webpack.mix.js",
+        "prod": "npm run production",
+        "production": "mix --production --mix-config=webpack.mix.js"
+    },
+    "devDependencies": {
+        "autoprefixer": "^10.4.2",
+        "laravel-mix": "^6.0.11",
+        "lodash": "^4.17.20",
+        "postcss": "^8.4.5",
+        "tailwindcss": "^3.0.17"
+    }
+}

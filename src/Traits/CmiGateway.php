@@ -3,14 +3,21 @@
 namespace Combindma\Cmi\Traits;
 
 use Combindma\Cmi\Cmi;
+use Illuminate\Support\Facades\Log;
 
 trait CmiGateway
 {
     public function requestPayment(Cmi $cmiClient, array $params = [])
     {
-        $cmiClient->guardAgainstInvalidRequest();
-        $payData = $cmiClient->getCmiData($params);
-        $hash = $cmiClient->getHash($params);
+        try {
+            $cmiClient->guardAgainstInvalidRequest();
+            $payData = $cmiClient->getCmiData($params);
+            $hash = $cmiClient->getHash($params);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return redirect($cmiClient->getShopUrl())->withErrors(['payment' => __('Une erreur est survenue, veuillez réessayer ultérieurement.')]);
+        }
 
         return view('cmi::request-payment', compact('cmiClient', 'payData', 'hash'));
     }
@@ -25,15 +32,16 @@ trait CmiGateway
         $cmiClient->setAmount(100);
         $cmiClient->setBillToName('Combind Agency');
         $cmiClient->setEmail('webmaster@combind.ma');
-        $cmiClient->setTel(0600000000);
-        $cmiClient->setCurrency(504);
+        $cmiClient->setTel('0600000000');
+        $cmiClient->setCurrency('504');
         $cmiClient->setDescription('ceci est un exemple à utiliser');
         $otherData = [
-            'billToStreet1' => '',
-            'billToCity' => '',
-            'BillToCountry' => '',
+            'billToStreet1' => 'street fighter',
+            'billToCity' => 'casanegra',
+            'BillToCountry' => 'morocco',
             //etc...
         ];
-        $this->requestPayment($cmiClient, $otherData);
+
+        return $this->requestPayment($cmiClient, $otherData);
     }
 }
