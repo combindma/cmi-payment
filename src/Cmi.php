@@ -92,6 +92,21 @@ class Cmi
         $this->callbackResponse = false;
     }
 
+    public function setOkUrl(string $okUrl): void
+    {
+        $this->okUrl = $okUrl;
+    }
+
+    public function setFailUrl(string $failUrl): void
+    {
+        $this->failUrl = $failUrl;
+    }
+
+    public function setShopUrl(string $shopUrl): void
+    {
+        $this->shopUrl = $shopUrl;
+    }
+
     public function setSessionTimeout($seconds): void
     {
         $this->sessionTimeout = (string)$seconds;
@@ -132,9 +147,9 @@ class Cmi
         $this->currency = (string)$currency;
     }
 
-    public function setCurrenciesList(bool $currenciesList): void
+    public function enableCurrenciesList(): void
     {
-        $this->currenciesList = $currenciesList;
+        $this->currenciesList = true;
     }
 
     public function setAmountCur($amountCur): void
@@ -150,11 +165,6 @@ class Cmi
     public function setDescription(string $description): void
     {
         $this->description = $description;
-    }
-
-    public function setOkUrl(string $okUrl): void
-    {
-        $this->okUrl = $okUrl;
     }
 
     public function getHash(array $params = []): string
@@ -177,32 +187,54 @@ class Cmi
 
     private function getPlainText(&$data): string
     {
-        $this->formatData($data);
         $plainText = '';
-        foreach ($data as $value) {
-            $lowerParam = strtolower($value);
-            if ($lowerParam != 'hash' && $lowerParam != 'encoding') {
-                $plainText = $plainText . $value . "|";
+        ksort($data);
+        foreach ($data as $key => $value) {
+            $formattedValue = trim($value);
+            $formattedValue = str_replace("|", "\\|", str_replace("\\", "\\\\", $formattedValue));
+            if (strtolower($key) != 'hash' && strtolower($key) != 'encoding') {
+                $plainText = $plainText . $formattedValue . "|";
             }
         }
+
         $escapedStoreKey = str_replace("|", "\\|", str_replace("\\", "\\\\", $this->storeKey));
 
         return $plainText . $escapedStoreKey;
     }
 
-    private function formatData(&$data): void
-    {
-        natcasesort($data);
-        foreach ($data as $key => $value) {
-            $formattedValue = trim($value);
-            $formattedValue = str_replace("|", "\\|", str_replace("\\", "\\\\", $formattedValue));
-            $data[$key] = $formattedValue;
-        }
-    }
-
     private function unsetData(&$data): void
     {
         unset($data['storeKey'], $data['baseUri']);
+    }
+
+    public function validateHash(array $data, $actualHash)
+    {
+        $this->unsetData($data);
+        $postParams = [];
+        foreach ($data as $key => $value) {
+            array_push($postParams, $key);
+        }
+        natcasesort($postParams);
+
+        $hashval = "";
+        foreach ($postParams as $param) {
+            $paramValue = trim(html_entity_decode(preg_replace("/\n$/", "", $data[$param]), ENT_QUOTES, 'UTF-8'));
+            $escapedParamValue = str_replace("|", "\\|", str_replace("\\", "\\\\", $paramValue));
+            $escapedParamValue = preg_replace('/document(.)/i', 'document.', $escapedParamValue);
+
+            $lowerParam = strtolower($param);
+            if ($lowerParam != "hash" && $lowerParam != "encoding") {
+                $hashval = $hashval . $escapedParamValue . "|";
+            }
+        }
+
+        $escapedStoreKey = str_replace("|", "\\|", str_replace("\\", "\\\\", $this->storeKey));
+        $hashval = $hashval . $escapedStoreKey;
+
+        $calculatedHashValue = hash('sha512', $hashval);
+        $hash = base64_encode(pack('H*', $calculatedHashValue));
+
+        return $actualHash === $hash;
     }
 
     /**

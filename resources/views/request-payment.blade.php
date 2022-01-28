@@ -28,7 +28,7 @@
     @foreach($payData as $key => $value)
         <input type="hidden" name="{{ $key }}" value="{{ trim($value) }}">
     @endforeach
-        <input type="hidden" name="hash" value="{{ $hash }}">
+        <input type="hidden" name="HASH" value="{{ $hash }}">
 </form>
 
 <script type="text/javascript">

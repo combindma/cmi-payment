@@ -3,6 +3,7 @@
 namespace Combindma\Cmi\Traits;
 
 use Combindma\Cmi\Cmi;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 trait CmiGateway
@@ -16,32 +17,52 @@ trait CmiGateway
         } catch (\Exception $e) {
             Log::error($e);
 
-            return redirect($cmiClient->getShopUrl())->withErrors(['payment' => __('Une erreur est survenue, veuillez réessayer ultérieurement.')]);
+            return redirect($cmiClient->getShopUrl())->withErrors(['payment' => __('Une erreur est survenue au niveau de la requête, veuillez réessayer ultérieurement.')]);
         }
 
         return view('cmi::request-payment', compact('cmiClient', 'payData', 'hash'));
     }
 
-    /*
-     * Ceci est un exemple de requête que vous pouvez faire
-     * */
-    public function testCmiOrder()
+    public function callback(Request $request)
     {
-        $cmiClient = new Cmi();
-        $cmiClient->setOid(date('dmy').rand(100, 9000));
-        $cmiClient->setAmount(100);
-        $cmiClient->setBillToName('Combind Agency');
-        $cmiClient->setEmail('webmaster@combind.ma');
-        $cmiClient->setTel('0600000000');
-        $cmiClient->setCurrency('504');
-        $cmiClient->setDescription('ceci est un exemple à utiliser');
-        $otherData = [
-            'billToStreet1' => 'street fighter',
-            'billToCity' => 'casanegra',
-            'BillToCountry' => 'morocco',
-            //etc...
-        ];
+        $postData = $request->all();
+        if ($postData) {
+            $cmiClient = new Cmi();
+            if ($cmiClient->validateHash($postData, $postData['HASH']) && $_POST["ProcReturnCode"] == "00") {
+                $response = "ACTION=POSTAUTH";
+            } else {
+                $response = "FAILURE";
+            }
+        } else {
+            $response = "No Data POST";
+        }
 
-        return $this->requestPayment($cmiClient, $otherData);
+        return view('cmi::callback', compact('response'));
+    }
+
+    public function okUrl(Request $request)
+    {
+        /*
+         * Dans le cas d'une transaction approuvée, le client sera redirigé ici (paramètre envoyé par le site
+         * marchand dans la demande de paiement). Toutes les données reçues dans la demande de paiement
+         * du site marchand, ainsi que toutes les données de la transaction traitée seront envoyées par la plateforme
+         * CMI vers ce okUrl.
+         * */
+
+        //C'est ici où vous pouvez gérer l'état de la commande
+    }
+
+    public function failUrl(Request $request)
+    {
+        /*
+         * Dans le cas d'une transaction échouée, le client sera redirigé ici (paramètre envoyé par le site
+         * marchand dans la demande de paiement). Toutes les données reçues dans la demande de paiement
+         * du site marchand, ainsi que toutes les données de la transaction traitée seront envoyées par la plateforme CMI vers failUrl.
+         * */
+
+        //Par défaut nous redirigeons l'utilisateur vers la page shopUrl avec un message d'erreur
+        $cmiClient = new Cmi();
+
+        return redirect($cmiClient->getShopUrl())->withErrors(['payment' => __('Paiement échoué, une erreur est survenue lors de la transaction, veuillez réessayer ultérieurement.')]);
     }
 }
