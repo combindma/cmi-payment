@@ -107,6 +107,11 @@ class Cmi
         $this->shopUrl = $shopUrl;
     }
 
+    public function setCallbackUrl(string $callbackUrl): void
+    {
+        $this->callbackUrl = $callbackUrl;
+    }
+
     public function setSessionTimeout($seconds): void
     {
         $this->sessionTimeout = (string)$seconds;

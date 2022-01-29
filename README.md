@@ -78,9 +78,9 @@ class CheckoutController extends Controller {
 In your routes file, list the routes needed by CMI like this:
 
 ```php
-Route::get('/cmi/callback', [CheckoutController::class, 'callback']); //keep in mind you can use the path you want, but you should use the callback method implemented in CmiGateway Trait
-Route::get('/cmi/okUrl', [CheckoutController::class, 'okUrl']);// in CmiGateway trait this method is empty so that you can implement your process after successful payment 
-Route::get('/cmi/failUrl', [CheckoutController::class, 'failUrl']);// the fail url will redirect user to shopUrl with an error so that user can try to pay again 
+Route::post('/cmi/callback', [CheckoutController::class, 'callback'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class); //keep in mind you can use the path you want, but you should use the callback method implemented in CmiGateway Trait
+Route::post('/cmi/okUrl', [CheckoutController::class, 'okUrl'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);// in CmiGateway trait this method is empty so that you can implement your process after successful payment 
+Route::post('/cmi/failUrl', [CheckoutController::class, 'failUrl'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);// the fail url will redirect user to shopUrl with an error so that user can try to pay again 
 Route::get('/url-of-checkout', [CheckoutController::class, 'yourMethod']);// as an example, this is the route where the user will click pay now (We recommand to use it as shopUrl, so we can redirect user back in failure)
 ```
 
@@ -143,13 +143,16 @@ $cmiClient->setSymbolCur('EUR');
 $cmiClient->setDescription('add your description');
 
 //Remplacer L’URL par défaut utilisée pour rediriger le client vers le site marchand en cas d’autorisation de paiement acceptée.
-$cmiClient->setOkUrl('https://domain.com/okurl');
+$cmiClient->setOkUrl('https://domain.com/cmi/okurl');
 
 //Remplacer L’URL par défaut  utilisée pour rediriger le client vers le site marchand en cas d’autorisation de paiement échouée.
-$cmiClient->setFailUrl('https://domain.com/failurl');
+$cmiClient->setFailUrl('https://domain.com/cmi/failurl');
 
 //Remplacer L’URL par défaut de retour vers laquelle le client est redirigé lorsqu'il clique sur le bouton "Annuler" affiché sur la page de paiement.
-$cmiClient->setShopUrl('https://domain.com/shopurl'); 
+$cmiClient->setShopUrl('https://domain.com/cmi/shopurl'); 
+
+//Remplacer L’URL utilisée dans la requête de confirmation de paiement en mode server-to-server
+$cmiClient->setCallbackUrl('https://domain.com/callback'); 
 
 //Activer la redirection automatiquement du client vers le site marchand lorsque la transaction de paiement en ligne est traitée. (par défaut activé)
 $cmiClient->enableAutoRedirect();
