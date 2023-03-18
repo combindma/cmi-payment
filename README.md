@@ -14,7 +14,7 @@ Vous pouvez installer le package via composer :
 composer require combindma/cmi-payment
 ```
 
-Optionally, you can publish the config file with:
+En option, vous pouvez publier le fichier de configuration avec :
 
 ```bash
 php artisan vendor:publish --tag="cmi-payment-config"
