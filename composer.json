@@ -18,20 +18,19 @@
     "require": {
         "php": "^8.0",
         "spatie/laravel-package-tools": "^1.9.2",
-        "illuminate/contracts": "^8.73"
+        "illuminate/contracts": "^8.0|^9.0|^10.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.4",
+        "laravel/pint": "^1.0",
         "nunomaduro/collision": "^5.10",
         "nunomaduro/larastan": "^1.0",
-        "orchestra/testbench": "^6.22",
+        "orchestra/testbench": "^6.0|^7.0|^8.0",
         "pestphp/pest": "^1.21",
         "pestphp/pest-plugin-laravel": "^1.1",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
-        "phpunit/phpunit": "^9.5",
-        "spatie/laravel-ray": "^1.26"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
@@ -44,10 +43,12 @@
         }
     },
     "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest coverage",
-        "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint",
+        "format-v": "vendor/bin/pint -v"
     },
     "config": {
         "sort-packages": true,

@@ -2,22 +2,15 @@
 
 namespace Combindma\Cmi\Tests;
 
+use Combindma\Cmi\Cmi;
 use Combindma\Cmi\CmiServiceProvider;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
+    public Cmi $cmi;
 
-        Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Combindma\\Cmi\\Database\\Factories\\'.class_basename($modelName).'Factory'
-        );
-    }
-
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             CmiServiceProvider::class,
@@ -26,11 +19,13 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
-        config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_cmi-payment_table.php.stub';
-        $migration->up();
-        */
+        $app['config']->set('cmi-payment.clientId', 'valid_string');
+        $app['config']->set('cmi-payment.storeKey', 'valid_string');
+        $app['config']->set('cmi-payment.baseUri', 'https://test.cmi.ma');
+        $app['config']->set('cmi-payment.okUrl', 'https://test.cmi.ma');
+        $app['config']->set('cmi-payment.failUrl', 'https://test.cmi.ma');
+        $app['config']->set('cmi-payment.callbackUrl', 'https://test.cmi.ma');
+        $app['config']->set('cmi-payment.shopUrl', 'https://test.cmi.ma');
+        $this->cmi = new Cmi();
     }
 }

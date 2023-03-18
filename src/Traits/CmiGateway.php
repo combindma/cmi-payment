@@ -28,13 +28,13 @@ trait CmiGateway
         $postData = $request->all();
         if ($postData) {
             $cmiClient = new Cmi();
-            if ($cmiClient->validateHash($postData, $postData['HASH']) && $_POST["ProcReturnCode"] == "00") {
-                $response = "ACTION=POSTAUTH";
+            if ($cmiClient->validateHash($postData, $postData['HASH']) && $_POST['ProcReturnCode'] == '00') {
+                $response = 'ACTION=POSTAUTH';
             } else {
-                $response = "FAILURE";
+                $response = 'FAILURE';
             }
         } else {
-            $response = "No Data POST";
+            $response = 'No Data POST';
         }
 
         return view('cmi::callback', compact('response'));

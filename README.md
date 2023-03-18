@@ -1,14 +1,14 @@
-# Laravel package to communicate with the CMI payment plateform
+# Package Laravel pour communiquer avec la plateforme de paiement CMI
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/combindma/cmi-payment.svg?style=flat-square)](https://packagist.org/packages/combindma/cmi-payment)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/combindma/cmi-payment/run-tests?label=tests)](https://github.com/combindma/cmi-payment/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/combindma/cmi-payment/Check%20&%20fix%20styling?label=code%20style)](https://github.com/combindma/cmi-payment/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/combindma/cmi-payment/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/combindma/cmi-payment/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/combindma/cmi-payment/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/combindma/cmi-payment/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/combindma/cmi-payment.svg?style=flat-square)](https://packagist.org/packages/combindma/cmi-payment)
 
 
 ## Installation
 
-You can install the package via composer:
+Vous pouvez installer le package via composer :
 
 ```bash
 composer require combindma/cmi-payment
@@ -20,14 +20,15 @@ Optionally, you can publish the config file with:
 php artisan vendor:publish --tag="cmi-payment-config"
 ```
 
-Optionally, you can publish the views using
+Optionnellement, vous pouvez publier les vues en utilisant :
 
 ```bash
 php artisan vendor:publish --tag="cmi-payment-views"
 ```
+
 ## Configuration
 
-You must provide all the required credentials in your .env file:
+Vous devez fournir toutes les informations d'identification requises dans votre fichier .env :
 
 ```php
 CMI_CLIENT_ID= //Identifiant du marchand (attribué par le CMI)
@@ -36,13 +37,13 @@ CMI_BASE_URI= //Gateway de paiement en mode web (attribué par le CMI). Exemple 
 CMI_OK_URL= //L’URL utilisée pour rediriger le client vers le site marchand en cas d’autorisation de paiement acceptée.
 CMI_FAIL_URL= //L’URL utilisée pour rediriger le client vers le site marchand en cas d’autorisation de paiement échouée.
 CMI_SHOP_URL= //L'URL de retour vers laquelle le client est redirigé lorsqu'il clique sur le bouton "Annuler" affiché sur la page de paiement.
-CMI_CALLBACK_URL= //L’URL utilisée dans la requête de confirmation de paiement en mode server-to-server
+CMI_CALLBACK_URL= //L’URL utilisée dans la requête de confirmation de paiement en mode server to server
 ```
-See below how you can retrieve the okUrl, failUrl, shopUrl and callbackUrl.
+Voir ci-dessous comment vous pouvez récupérer les okUrl, failUrl, shopUrl et callbackUrl.
 
-## Usage
+## Utilisation
 
-As an example, imagine you have an ecommerce website, and in your CheckoutController you want to add CMI Gateway. So you must add CmiGateway trait to that controller:
+Par exemple, imaginez que vous avez un site de commerce électronique, et dans votre CheckoutController, vous voulez ajouter CMI Gateway. Vous devez donc ajouter la trait CmiGateway à ce contrôleur :
 
 ```php
 class CheckoutController extends Controller {
@@ -50,7 +51,7 @@ class CheckoutController extends Controller {
     use \Combindma\Cmi\Traits\CmiGateway;
     
     /*
-     * use this as an example of testing payment
+     * utilisez ceci comme exemple de test de paiement
      * */
     public function testCmiPayment()
     {
@@ -62,9 +63,9 @@ class CheckoutController extends Controller {
         $cmiClient->setTel('0021201020304');
         $cmiClient->setCurrency('504');
         $cmiClient->setDescription('ceci est un exemple à utiliser');
-        $cmiClient->disableCallbackRespense(); //Disable the call back responses, if you don't want to deal with callbackResponse.
+        $cmiClient->disableCallbackRespense(); //Désactivez les réponses de rappel, si vous ne voulez pas traiter la callbackResponse.
         $otherData = [
-            'billToStreet1' => 'Street Fighter', //be sure that the first letter of the key is not uppercase
+            'billToStreet1' => 'Street Fighter',
             'billToCity' => 'Casanegra',
             'billToCountry' => 'Morocco',
             //etc...
@@ -75,16 +76,18 @@ class CheckoutController extends Controller {
 }
 ```
 
-In your routes file, list the routes needed by CMI like this:
+Dans votre fichier de routes, listez les routes nécessaires à CMI comme ceci :
 
 ```php
-Route::post('/cmi/callback', [CheckoutController::class, 'callback'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class); //keep in mind you can use the path you want, but you should use the callback method implemented in CmiGateway Trait
-Route::post('/cmi/okUrl', [CheckoutController::class, 'okUrl'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);// in CmiGateway trait this method is empty so that you can implement your process after successful payment 
-Route::post('/cmi/failUrl', [CheckoutController::class, 'failUrl'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);// the fail url will redirect user to shopUrl with an error so that user can try to pay again 
-Route::get('/url-of-checkout', [CheckoutController::class, 'yourMethod']);// as an example, this is the route where the user will click pay now (We recommand to use it as shopUrl, so we can redirect user back in failure)
+Route::post('/cmi/callback', [CheckoutController::class, 'callback'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class); //notez que vous pouvez utiliser le chemin que vous voulez, mais vous devez utiliser la méthode de rappel (callback) implémentée dans la trait CmiGateway
+Route::post('/cmi/okUrl', [CheckoutController::class, 'okUrl'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);// dans la trait CmiGateway, cette méthode est vide pour que vous puissiez implémenter votre propre processus après un paiement réussi
+Route::post('/cmi/failUrl', [CheckoutController::class, 'failUrl'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);// la fail url redirigera l'utilisateur vers shopUrl avec une erreur pour que l'utilisateur puisse essayer de payer à nouveau
+Route::get('/url-of-checkout', [CheckoutController::class, 'yourMethod']);// Par exemple, c'est la route où l'utilisateur cliquera sur "Payer maintenant. "( Nous recommandons de l'utiliser comme shopUrl, afin de pouvoir rediriger l'utilisateur en cas d'échec du paiement)
+
+
 ```
 
-Now, you can specify the configuration file correctly:
+Maintenant, vous pouvez spécifier correctement le fichier de configuration :
 
 ```dotenv
 CMI_OK_URL=https://www.domain.com/cmi/okurl
@@ -92,26 +95,27 @@ CMI_FAIL_URL=https://www.domain.com/cmi/failurl
 CMI_SHOP_URL=https://www.domain.com/url-of-checkout
 CMI_CALLBACK_URL=https://www.domain.com/cmi/callback
 ```
-In your checkoutController you should implement your own process after the payment is being handled well:
+
+Dans votre CheckoutController, vous devez implémenter votre propre processus une fois que le paiement a été traité avec succès :
 
 ```php
 class CheckoutController extends Controller {
     public function okUrl(Request $request)
     {
-        //Look, in the orders’ DB for the record identified by the value of the "oid" parameter sent by the CMI platform in the request. And trait your order as you want.
+        // Cherchez dans la base de données des commandes pour l'enregistrement identifié par la valeur du paramètre "oid" envoyé par la plateforme CMI dans la requête. Traitez votre commande comme vous le souhaitez.
     }
 }
 ```
 
-After that You are good to go.
+Après cela, vous êtes prêt à accepter les paiements.
 
 
-Those are the available methods:
+Voici les méthodes disponibles :
 
 ```php
 $cmiClient = new Cmi();
 // Dans Cmi, vous devez fournir un identifiant de la commande, sauf que dans la plupart des cas la commande est créée après le paiement de l'utilisateur
-// donc à la place, vous pouvez utiliser soit un identifant de transaction ou l'identifiant du panier et ajouter 3 nombres aléatoires, et récupérer le panier actuel dans le callback en supprimant les 3 derniers chiffres.
+// donc à la place, vous pouvez utiliser soit un identifiant de transaction ou l'identifiant du panier et ajouter 3 nombres aléatoires, et récupérer le panier actuel dans le callback en supprimant les 3 derniers chiffres.
 // La valeur de oid doit être unique pour chaque transaction. Parce que si l'utilisateur clique sur revenir en arrière sans payer. Vous ne pouvez pas utiliser le même identifiant de transaction (Allez comprendre)
 $cmiClient->setOid($cart->id.rand(100,900));
 
