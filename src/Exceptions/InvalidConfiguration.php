@@ -13,7 +13,7 @@ class InvalidConfiguration extends Exception
 
     public static function storeKeyInvalid(): static
     {
-        return new static('La clé de magasin (storeKey) renseignée n\'est pas valide. Veuillez reseigner une clé de magasin qui ne contient aucun espace ou une chaîne de caractère vide.');
+        return new static('La clé de magasin (storeKey) renseignée n\'est pas valide. Veuillez renseigner une clé de magasin qui ne contient aucun espace ou une chaîne de caractère vide.');
     }
 
     public static function clientIdNotSpecified(): static
@@ -23,7 +23,7 @@ class InvalidConfiguration extends Exception
 
     public static function clientIdInvalid(): static
     {
-        return new static('L\'identifiant du marchand (clientId) renseigné n\'est pas valide. Veuillez reseigner un identifiant du marchand qui ne contient aucun espace ou une chaîne de caractère vide.');
+        return new static('L\'identifiant du marchand (clientId) renseigné n\'est pas valide. Veuillez renseigner un identifiant du marchand qui ne contient aucun espace ou une chaîne de caractère vide.');
     }
 
     public static function attributeNotSpecified(string $attribute): static
@@ -33,12 +33,12 @@ class InvalidConfiguration extends Exception
 
     public static function attributeInvalidString(string $attribute): static
     {
-        return new static('La valeur de '.$attribute.' renseignée n\'est pas valide. Veuillez reseigner un(e) '.$attribute.' qui ne contient aucun espace ou une chaîne de caractère vide.');
+        return new static('La valeur de '.$attribute.' renseignée n\'est pas valide. Veuillez renseigner un(e) '.$attribute.' qui ne contient aucun espace ou une chaîne de caractère vide.');
     }
 
     public static function attributeInvalidUrl(string $attribute): static
     {
-        return new static('L\'url '.$attribute.' renseigné n\'est pas valide. Veuillez reseigner un lien valide.');
+        return new static('L\'url '.$attribute.' renseigné n\'est pas valide. Veuillez renseigner un lien valide.');
     }
 
     public static function langValueInvalid(): static

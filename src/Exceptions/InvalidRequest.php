@@ -8,7 +8,7 @@ class InvalidRequest extends Exception
 {
     public static function amountNotSpecified(): static
     {
-        return new static('Aucun montant n\'a été renseigné. Veuilez renseigner un montant de la transaction.');
+        return new static('Aucun montant n\'a été renseigné. Veuillez renseigner un montant de la transaction.');
     }
 
     public static function amountValueInvalid(): static
@@ -18,7 +18,7 @@ class InvalidRequest extends Exception
 
     public static function currencyNotSpecified(): static
     {
-        return new static('Aucun code de devise n\'a été renseigné. Veuilez renseigner un code ISO de la devise de la transaction.');
+        return new static('Aucun code de devise n\'a été renseigné. Veuillez renseigner un code ISO de la devise de la transaction.');
     }
 
     public static function currencyValueInvalid(): static
@@ -33,7 +33,7 @@ class InvalidRequest extends Exception
 
     public static function attributeInvalidString(string $attribute): static
     {
-        return new static('La valeur de '.$attribute.' renseignée n\'est pas valide. Veuillez reseigner un(e) '.$attribute.' qui ne contient aucun espace ou une chaîne de caractère vide.');
+        return new static('La valeur de '.$attribute.' renseignée n\'est pas valide. Veuillez renseigner un(e) '.$attribute.' qui ne contient aucun espace ou une chaîne de caractère vide.');
     }
 
     public static function emailValueInvalid(): static

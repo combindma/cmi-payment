@@ -60,7 +60,7 @@ trait CmiGateway
          * du site marchand, ainsi que toutes les données de la transaction traitée seront envoyées par la plateforme CMI vers failUrl.
          * */
 
-        //Par défaut nous redirigeons l'utilisateur vers la page shopUrl avec un message d'erreur
+        //Par défaut, nous redirigeons l'utilisateur vers la page shopUrl avec un message d'erreur
         $cmiClient = new Cmi();
 
         return redirect($cmiClient->getShopUrl())->withErrors(['payment' => __('Paiement échoué, une erreur est survenue lors de la transaction, veuillez réessayer ultérieurement.')]);

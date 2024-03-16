@@ -83,17 +83,17 @@ class Cmi
         $this->guardAgainstInvalidConfiguration();
     }
 
-    public function getBaseUri(): null|string
+    public function getBaseUri(): ?string
     {
         return $this->baseUri;
     }
 
-    public function getFailUrl(): null|string
+    public function getFailUrl(): ?string
     {
         return $this->failUrl;
     }
 
-    public function getShopUrl(): null|string
+    public function getShopUrl(): ?string
     {
         return $this->shopUrl;
     }
@@ -429,7 +429,7 @@ class Cmi
             throw InvalidConfiguration::attributeNotSpecified('shopUrl');
         }
 
-        if (preg_match('/\s/', $this->failUrl)) {
+        if (preg_match('/\s/', $this->shopUrl)) {
             throw InvalidConfiguration::attributeInvalidString('shopUrl');
         }
 
